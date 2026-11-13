@@ -1,0 +1,43 @@
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Environment variables & secrets (CRITICAL: NEVER COMMIT KEYS)
+.env
+.env.*
+!.env.example
+
+# Streamlit config & cache
+.streamlit/
+
+# Uploaded/user documents and local data (do not commit)
+*.pdf
+!sample_resumes/*.pdf
+*.docx
+*.doc
+uploads/
+
+# Logs and temp
+*.log
+*.tmp
+
+# Test/coverage artifacts
+.coverage
+htmlcov/
+
+# IDE/editor (local)
+.vscode/
+.idea/
+
+# OS specific files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
