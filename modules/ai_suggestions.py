@@ -44,15 +44,15 @@ class AISuggestionEngine:
                             "Detected emails/phone numbers/URLs were masked before transmission. Avoid submitting sensitive personal data."
                         ),
                     }
-            except Exception as e:
+            except Exception:
                 fallback = self._generate_rule_based(matching_analysis)
-                fallback["notice"] = f"LLM API unavailable ({type(e).__name__}). External AI unavailable; using offline rule-based feedback."
+                fallback["notice"] = "External AI unavailable. Showing offline rule-based feedback instead."
                 fallback["privacy_disclosure"] = "Data Privacy: Processed locally in memory. No external API call succeeded."
                 return fallback
 
         fallback = self._generate_rule_based(matching_analysis)
         fallback["notice"] = (
-            "Running in offline rule-based mode. To enable Gemini suggestions, provide GEMINI_API_KEY and explicit consent in the app."
+            "Running in offline rule-based mode. Enable Gemini suggestions by configuring a key and providing explicit consent."
         )
         fallback["privacy_disclosure"] = "Data Privacy: Processed locally in memory. No external transmission."
         return fallback
@@ -91,13 +91,7 @@ class AISuggestionEngine:
 
         response = requests.post(url, headers=headers, json=payload, timeout=12)
         if response.status_code != 200:
-            msg = ""
-            try:
-                err = response.json().get("error", {})
-                msg = err.get("message", "") or err.get("status", "")
-            except Exception:
-                msg = response.text[:120]
-            raise RuntimeError(f"Gemini API HTTP {response.status_code}: {msg}".strip())
+            raise RuntimeError(f"Gemini API request failed with status {response.status_code}")
 
         data = response.json()
         candidates = data.get("candidates") or []

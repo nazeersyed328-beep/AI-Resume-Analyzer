@@ -10,6 +10,7 @@ Handles:
 """
 
 import io
+import os
 from typing import Union, Dict, Any
 import pypdf
 from pypdf.errors import PdfReadError
@@ -31,6 +32,14 @@ def extract_text_from_pdf(pdf_source: Union[str, io.BytesIO, bytes]) -> Dict[str
             - error (str or None): Error message if extraction failed
     """
     # 1. Normalize input to a file-like stream or path
+    if isinstance(pdf_source, str) and not os.path.exists(pdf_source):
+        return {
+            "success": False,
+            "text": "",
+            "num_pages": 0,
+            "is_scanned": False,
+            "error": "The specified PDF file was not found.",
+        }
     if isinstance(pdf_source, bytes):
         pdf_source = io.BytesIO(pdf_source)
 
@@ -102,13 +111,13 @@ def extract_text_from_pdf(pdf_source: Union[str, io.BytesIO, bytes]) -> Dict[str
             "error": None
         }
 
-    except PdfReadError as e:
+    except PdfReadError:
         return {
             "success": False,
             "text": "",
             "num_pages": 0,
             "is_scanned": False,
-            "error": f"Corrupted or invalid PDF format: {str(e)}"
+            "error": "Corrupted or invalid PDF format. Please upload a valid, text-based PDF."
         }
     except FileNotFoundError:
         return {
@@ -116,14 +125,14 @@ def extract_text_from_pdf(pdf_source: Union[str, io.BytesIO, bytes]) -> Dict[str
             "text": "",
             "num_pages": 0,
             "is_scanned": False,
-            "error": "The specified PDF file was not found."
+            "error": "The specified PDF file could not be read."
         }
-    except Exception as e:
+    except Exception:
         return {
             "success": False,
             "text": "",
             "num_pages": 0,
             "is_scanned": False,
-            "error": f"An unexpected error occurred while reading the PDF: {str(e)}"
+            "error": "An unexpected error occurred while reading the PDF. Please try a different text-based PDF file."
         }
 
